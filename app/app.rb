@@ -1,9 +1,6 @@
-#!/usr/bin/ruby
-
 require_relative './cyk'
 require_relative './reader'
 require_relative './printer'
-
 
 grammar = Reader.new.load_grammar()
 words = gets.chomp.split(" ")

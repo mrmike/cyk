@@ -1,5 +1,3 @@
-#!/usr/bin/ruby
-
 class Cyk
 
     def initialize(grammar, words)
