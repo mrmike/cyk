@@ -1,55 +1,51 @@
 #!/usr/bin/ruby
 
-require_relative './reader'
-require 'text-table'
+class Cyk
 
-abort "Please provide input to program" unless ARGV.count > 0
+    def initialize(grammar, words)
+        @grammar = grammar
+        @words = words
+        @n = words.count
+        @table = Array.new(@n+1) {Array.new(@n+1, nil)}
 
-grammar = load_grammar()
-
-input = ARGV[0]
-words = input.split(" ")
-n = words.count
-r = grammar.count
-
-p = Array.new(n+1) {Array.new(n+1,nil)}
-
-words.each_with_index do |word, idx|
-    if grammar.has_key?(word)
-        value = grammar[word]
-        index = grammar.keys.index(word)
-        p[idx+1][1] = value
+        init_table(words)
     end
-end
 
-(2..n).each do |i|
-    (1..n-i+1).each do |j|
-        (1..i-1).each do |k|
-            first = p[j][k]
-            second = p[j+k][i-k]
-            unless first.nil? and second.nil?
-                rule = "#{first} #{second}"
-                if grammar.has_key?(rule)
-                    p[j][i] = grammar[rule]
+    def init_table(words)
+        words.each_with_index do |word, idx|
+            if @grammar.has_key?(word)
+                value = @grammar[word]
+                index = @grammar.keys.index(word)
+                @table[idx+1][1] = value
+                end
+            end
+    end
+
+    def start()
+        (2..@n).each do |i|
+            (1..@n-i+1).each do |j|
+                (1..i-1).each do |k|
+                    add_rule(i, j, k)
                 end
             end
         end
     end
-end
 
-puts "Sentence belongs to given grammar" unless p[1][n].nil?
-
-# print results
-table = Text::Table.new
-table.head = [" "] + words
-(1..n).each do |i|
-    row = Array.new
-    row.push(i)
-    (1..n).each do |j|
-        row.push(p[j][i])
+    def add_rule(i, j, k)
+        first = @table[j][k]
+        second = @table[j+k][i-k]
+        return if first.nil? and second.nil?
+        rule = "#{first} #{second}"
+        if (@grammar.has_key?(rule))
+            @table[j][i] = @grammar[rule]
+        end
     end
 
-    table.rows << row
-end
+    def belongs
+        return @table[1][@n] != nil
+    end
 
-puts table.to_s
+    def table
+        return @table
+    end
+end
